@@ -86,9 +86,7 @@
 
 - (void)setNumber:(NSNumber *)number
 {
-    NSString *string = [NSString stringWithFormat:@"%.*lf",
-                        self.numberFormatter.maximumFractionDigits,
-                        number.doubleValue];
+    NSString *string = [self.numberFormatter stringFromNumber:number];
     [self setText:string];
 }
 
@@ -108,10 +106,12 @@
 
 - (NSNumber *)numberFromString:(NSString*)string
 {
+    NSNumber *number = [self.numberFormatter numberFromString:string];
+    BOOL isNumberNegative = ([number compare:@0] == NSOrderedAscending);
     NSString* digitString = [[string componentsSeparatedByCharactersInSet:self.invalidInputCharacterSet] componentsJoinedByString:@""];
     NSParameterAssert(self.numberFormatter.maximumFractionDigits == self.numberFormatter.minimumFractionDigits);
     NSUInteger fractionDigitsCount = self.numberFormatter.maximumFractionDigits;
-    NSNumber *number = [NSNumber numberWithDouble:[digitString doubleValue] / pow(10.0, fractionDigitsCount)];
+    number = [NSNumber numberWithDouble:[digitString doubleValue] / pow(10.0, fractionDigitsCount) * (isNumberNegative ? -1 : 1)];
     return number;
 }
 
